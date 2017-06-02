@@ -2,6 +2,8 @@
 
 Cordova / PhoneGap 3.5+ extension for Native Audio playback, aimed at HTML5 gaming and audio applications which require minimum latency, polyphony and concurrency.
 
+--Forked from official branch to include playing audio from external device storage
+
 ## Contents
 
 1. [Description](#description)
@@ -72,7 +74,7 @@ Fully concurrent and multichannel.
 
 * params
  * id - string unique ID for the audio file
- * assetPath - the relative path or absolute URL (inluding http://) to the audio asset.
+ * assetPath - the relative path or absolute to the audio asset.
  * successCallback - success callback function
  * errorCallback - error callback function
 
