@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
-import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -84,6 +84,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 				}
 
 				String fullPath = assetPath.replace("file://", "");
+
 
 				FileInputStream fis = new FileInputStream(fullPath);
 				NativeAudioAsset asset = new NativeAudioAsset(
