@@ -31,7 +31,8 @@ import org.json.JSONObject;
 
 
 public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFocusChangeListener {
-
+    private static final String TAG = "NativeAudio";
+    
     /* options */
     public static final String OPT_FADE_MUSIC = "fadeMusic";
 
@@ -47,8 +48,6 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 	public static final String UNLOAD="unload";
     public static final String ADD_COMPLETE_LISTENER="addCompleteListener";
 	public static final String SET_VOLUME_FOR_COMPLEX_ASSET="setVolumeForComplexAsset";
-
-	private static final String LOGTAG = "NativeAudio";
 
 	private static HashMap<String, NativeAudioAsset> assetMap;
     private static ArrayList<NativeAudioAsset> resumeList;
@@ -67,7 +66,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 			audioID = data.getString(0);
 			if (!assetMap.containsKey(audioID)) {
 				String assetPath = data.getString(1);
-				Log.d(LOGTAG, "preloadComplex - " + audioID + ": " + assetPath);
+				Log.d(TAG, "preloadComplex - " + audioID + ": " + assetPath);
 
 				double volume;
 				if (data.length() <= 2) {
@@ -85,10 +84,10 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 
 				String fullPath = assetPath.replace("file://", "");
 
+                Log.d(TAG, "[audio] about to play: " + fullPath);
 
-				FileInputStream fis = new FileInputStream(fullPath);
 				NativeAudioAsset asset = new NativeAudioAsset(
-						fis.getFD(), voices, (float)volume);
+						fullPath, voices, (float)volume);
 				assetMap.put(audioID, asset);
 
 				return new PluginResult(Status.OK);
@@ -106,7 +105,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 		final String audioID;
 		try {
 			audioID = data.getString(0);
-			//Log.d( LOGTAG, "play - " + audioID );
+			//Log.d( TAG, "play - " + audioID );
 
 			if (assetMap.containsKey(audioID)) {
 				NativeAudioAsset asset = assetMap.get(audioID);
@@ -142,7 +141,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 		String audioID;
 		try {
 			audioID = data.getString(0);
-			//Log.d( LOGTAG, "stop - " + audioID );
+			//Log.d(TAG, "stop - " + audioID );
 
 			if (assetMap.containsKey(audioID)) {
 				NativeAudioAsset asset = assetMap.get(audioID);
@@ -161,7 +160,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 		String audioID;
 		try {
 			audioID = data.getString(0);
-			Log.d( LOGTAG, "unload - " + audioID );
+			Log.d(TAG, "unload - " + audioID );
 
 			if (assetMap.containsKey(audioID)) {
 				NativeAudioAsset asset = assetMap.get(audioID);
@@ -185,7 +184,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 		try {
 			audioID = data.getString(0);
 			volume = (float) data.getDouble(1);
-			Log.d( LOGTAG, "setVolume - " + audioID );
+			Log.d(TAG, "setVolume - " + audioID );
 
 			if (assetMap.containsKey(audioID)) {
 				NativeAudioAsset asset = assetMap.get(audioID);
@@ -202,11 +201,11 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 	protected void pluginInitialize() {
 		AudioManager am = (AudioManager)cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
 
-	        int result = am.requestAudioFocus(this,
-	                // Use the music stream.
-	                AudioManager.STREAM_MUSIC,
-	                // Request permanent focus.
-	                AudioManager.AUDIOFOCUS_GAIN);
+	        // int result = am.requestAudioFocus(this,
+	        //         // Use the music stream.
+	        //         AudioManager.STREAM_MUSIC,
+	        //         // Request permanent focus.
+	        //         AudioManager.AUDIOFOCUS_GAIN);
 
 		// Allow android to receive the volume events
 		this.webView.setButtonPlumbedToJs(KeyEvent.KEYCODE_VOLUME_DOWN, false);
@@ -215,7 +214,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 
 	@Override
 	public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
-		Log.d(LOGTAG, "Plugin Called: " + action);
+		Log.d(TAG, "Plugin Called: " + action);
 
 		PluginResult result = null;
 		initSoundPool();

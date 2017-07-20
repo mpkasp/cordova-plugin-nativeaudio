@@ -12,15 +12,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
+import android.util.Log;
 import android.content.res.AssetFileDescriptor;
 
 public class NativeAudioAsset
 {
+	private static final String TAG = "NativeAudio";
 
 	private ArrayList<NativeAudioAssetComplex> voices;
 	private int playIndex = 0;
 
-	public NativeAudioAsset(FileDescriptor afd, int numVoices, float volume) throws IOException
+	public NativeAudioAsset(String afd, int numVoices, float volume) throws IOException
 	{
 		voices = new ArrayList<NativeAudioAssetComplex>();
 

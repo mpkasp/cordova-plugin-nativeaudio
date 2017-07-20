@@ -10,6 +10,7 @@ package com.rjfun.cordova.plugin.nativeaudio;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
+import android.util.Log;
 import java.io.FileDescriptor;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
@@ -18,6 +19,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
 
 public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletionListener {
+	private static final String TAG = "NativeAudio";
 
 	private static final int INVALID = 0;
 	private static final int PREPARED = 1;
@@ -30,7 +32,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 	private int state;
     Callable<Void> completeCallback;
 
-	public NativeAudioAssetComplex( FileDescriptor fd, float volume)  throws IOException
+	public NativeAudioAssetComplex(String fd, float volume)  throws IOException
 	{
 		state = INVALID;
 		mp = new MediaPlayer();
@@ -44,6 +46,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 
 	public void play(Callable<Void> completeCb) throws IOException
 	{
+		Log.d(TAG, "[audio] play called");
         completeCallback = completeCb;
 		invokePlay( false );
 	}
