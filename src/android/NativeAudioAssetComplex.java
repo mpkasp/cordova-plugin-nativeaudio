@@ -41,8 +41,8 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
         mp.setOnPreparedListener(this);
 		mp.setDataSource(fd);
 		mp.setAudioAttributes(new AudioAttributes.Builder()
-			.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-			.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+			.setUsage(AudioAttributes.USAGE_MEDIA)
+			.setContentType(AudioAttributes.CONTENT_TYPE_MUSIC) // maybe CONTENT_TYPE_SPEECH or CONTENT_TYPE_MUSIC
 			.build());
 		mp.setVolume(volume, volume);
 		mp.prepare();
@@ -50,7 +50,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 
 	public void play(Callable<Void> completeCb) throws IOException
 	{
-		Log.d(TAG, "[audio] play called");
+		Log.d(TAG, "[play] play called");
         completeCallback = completeCb;
 		invokePlay( false );
 	}
@@ -85,7 +85,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 	{
 		try
 		{
-    				if ( mp.isPlaying() )
+    		if ( mp.isPlaying() )
 				{
 					mp.pause();
 					return true;
@@ -112,7 +112,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 				state = INVALID;
 				mp.pause();
 				mp.seekTo(0);
-	           	}
+	        }
 		}
 	        catch (IllegalStateException e)
 	        {
@@ -173,8 +173,8 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 		{
 			this.state = INVALID;
 			try {
-				Log.d(TAG, "[audio] would have stopped...");
-				// this.stop();
+				Log.d(TAG, "[audio] stopped...");
+				this.stop();
 				if (completeCallback != null)
                 	completeCallback.call();
 			}

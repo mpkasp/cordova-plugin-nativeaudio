@@ -103,6 +103,16 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 
 	private PluginResult executePlayOrLoop(String action, JSONArray data) {
 		final String audioID;
+        AudioManager am = (AudioManager)cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
+
+        int result = am.requestAudioFocus(this,
+            // Use the music stream.
+            AudioManager.STREAM_MUSIC,
+            // Request permanent focus.
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+
+        Log.d(TAG, "[play] requested audio focus: " + result);
+
 		try {
 			audioID = data.getString(0);
 			//Log.d( TAG, "play - " + audioID );
@@ -201,11 +211,13 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 	protected void pluginInitialize() {
 		AudioManager am = (AudioManager)cordova.getActivity().getSystemService(Context.AUDIO_SERVICE);
 
-	        // int result = am.requestAudioFocus(this,
-	        //         // Use the music stream.
-	        //         AudioManager.STREAM_MUSIC,
-	        //         // Request permanent focus.
-	        //         AudioManager.AUDIOFOCUS_GAIN);
+	    int result = am.requestAudioFocus(this,
+            // Use the music stream.
+            AudioManager.STREAM_MUSIC,
+            // Request permanent focus.
+            AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK);
+
+        Log.d(TAG, "[pluginInitialize] requested audio focus: " + result);
 
 		// Allow android to receive the volume events
 		this.webView.setButtonPlumbedToJs(KeyEvent.KEYCODE_VOLUME_DOWN, false);
@@ -301,10 +313,13 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 
     public void onAudioFocusChange(int focusChange) {
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            Log.d(TAG, "[onAudioFocusChange] AUDIOFOCUS_LOSS_TRANSIENT");
             // Pause playback
         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            Log.d(TAG, "[onAudioFocusChange] AUDIOFOCUS_GAIN");
             // Resume playback
         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            Log.d(TAG, "[onAudioFocusChange] AUDIOFOCUS_LOSS");
             // Stop playback
         }
     }
@@ -312,7 +327,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
     @Override
     public void onPause(boolean multitasking) {
         super.onPause(multitasking);
-
+        Log.d(TAG, "[audio] onPause");
         for (HashMap.Entry<String, NativeAudioAsset> entry : assetMap.entrySet()) {
             NativeAudioAsset asset = entry.getValue();
             boolean wasPlaying = asset.pause();
@@ -325,6 +340,7 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
     @Override
     public void onResume(boolean multitasking) {
         super.onResume(multitasking);
+        Log.d(TAG, "[audio] onResume");
         while (!resumeList.isEmpty()) {
             NativeAudioAsset asset = resumeList.remove(0);
             asset.resume();
