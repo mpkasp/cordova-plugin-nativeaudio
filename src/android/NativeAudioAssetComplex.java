@@ -14,6 +14,7 @@ import android.util.Log;
 import java.io.FileDescriptor;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -39,7 +40,10 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
         mp.setOnCompletionListener(this);
         mp.setOnPreparedListener(this);
 		mp.setDataSource(fd);
-		mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		mp.setAudioAttributes(new AudioAttributes.Builder()
+			.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+			.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+			.build());
 		mp.setVolume(volume, volume);
 		mp.prepare();
 	}
@@ -56,6 +60,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 		Boolean playing = mp.isPlaying();
 		if ( playing )
 		{
+			Log.d(TAG, "[audio] playing");
 			mp.pause();
 			mp.setLooping(loop);
 			mp.seekTo(0);
@@ -63,11 +68,13 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 		}
 		if ( !playing && state == PREPARED )
 		{
+			Log.d(TAG, "[audio] prepared");
 			state = (loop ? PENDING_LOOP : PENDING_PLAY);
 			onPrepared( mp );
 		}
 		else if ( !playing )
 		{
+			Log.d(TAG, "[audio] not playing");
 			state = (loop ? PENDING_LOOP : PENDING_PLAY);
 			mp.setLooping(loop);
 			mp.start();
@@ -161,13 +168,15 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 
 	public void onCompletion(MediaPlayer mPlayer)
 	{
+		Log.d(TAG, "[audio] Complete.");
 		if (state != LOOPING)
 		{
 			this.state = INVALID;
 			try {
-				this.stop();
+				Log.d(TAG, "[audio] would have stopped...");
+				// this.stop();
 				if (completeCallback != null)
-                completeCallback.call();
+                	completeCallback.call();
 			}
 			catch (Exception e)
 			{
