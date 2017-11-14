@@ -77,6 +77,7 @@ public class NativeAudioAssetComplex implements OnPreparedListener, OnCompletion
 			Log.d(TAG, "[audio] not playing");
 			state = (loop ? PENDING_LOOP : PENDING_PLAY);
 			mp.setLooping(loop);
+			mp.seekTo(0);
 			mp.start();
 		}
 	}

@@ -46,6 +46,8 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 	public static final String STOP="stop";
 	public static final String LOOP="loop";
 	public static final String UNLOAD="unload";
+    public static final String PAUSE="pause";
+    public static final String RESUME="resume";
     public static final String ADD_COMPLETE_LISTENER="addCompleteListener";
 	public static final String SET_VOLUME_FOR_COMPLEX_ASSET="setVolumeForComplexAsset";
 
@@ -166,6 +168,53 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 		return new PluginResult(Status.OK);
 	}
 
+    private PluginResult executePause(JSONArray data) {
+        String audioID;
+        try {
+            audioID = data.getString(0);
+            Log.d(TAG, "[audio] pause - " + audioID );
+            if (assetMap.containsKey(audioID)) {
+                NativeAudioAsset asset = assetMap.get(audioID);
+                boolean wasPlaying = asset.pause();
+                if (wasPlaying) {
+                    resumeList.add(asset);
+                }
+            } else {
+                return new PluginResult(Status.ERROR, ERROR_NO_AUDIOID);
+            }
+        } catch (JSONException e) {
+            return new PluginResult(Status.ERROR, e.toString());
+        }
+
+        return new PluginResult(Status.OK);
+    }
+
+    private PluginResult executeResume(JSONArray data) {
+        String audioID;
+        try {
+            audioID = data.getString(0);
+            Log.d(TAG, "[audio] resume");
+            if (assetMap.containsKey(audioID)) {
+                Log.d(TAG, "[audio] resuming by audioId - " + audioID );
+                NativeAudioAsset asset = assetMap.get(audioID);
+                asset.resume();
+            } else if (!resumeList.isEmpty()) {
+                Log.d(TAG, "[audio] resuming all available.");
+                while (!resumeList.isEmpty()) {
+                    NativeAudioAsset asset = resumeList.remove(0);
+                    asset.resume();
+                }
+            } else {
+                Log.d(TAG, "[audio] can't find anything to resume!");
+                return new PluginResult(Status.ERROR, ERROR_NO_AUDIOID);
+            }
+        } catch (JSONException e) {
+            return new PluginResult(Status.ERROR, e.toString());
+        }
+
+        return new PluginResult(Status.OK);
+    }
+
 	private PluginResult executeUnload(JSONArray data) {
 		String audioID;
 		try {
@@ -265,7 +314,21 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
 		            }
 		        });
 
-            } else if (UNLOAD.equals(action)) {
+            } else if (PAUSE.equals(action)) {
+                cordova.getThreadPool().execute(new Runnable() {
+                    public void run() {
+                        callbackContext.sendPluginResult( executePause(data) );
+                    }
+                });
+
+            }else if (RESUME.equals(action)) {
+                cordova.getThreadPool().execute(new Runnable() {
+                    public void run() {
+                        callbackContext.sendPluginResult( executeResume(data) );
+                    }
+                });
+
+            }else if (UNLOAD.equals(action)) {
                 cordova.getThreadPool().execute(new Runnable() {
                     public void run() {
                         executeStop(data);
@@ -327,23 +390,23 @@ public class NativeAudio extends CordovaPlugin implements AudioManager.OnAudioFo
     @Override
     public void onPause(boolean multitasking) {
         super.onPause(multitasking);
-        Log.d(TAG, "[audio] onPause");
-        for (HashMap.Entry<String, NativeAudioAsset> entry : assetMap.entrySet()) {
-            NativeAudioAsset asset = entry.getValue();
-            boolean wasPlaying = asset.pause();
-            if (wasPlaying) {
-                resumeList.add(asset);
-            }
-        }
+        Log.d(TAG, "[audio] onPause - doing nothing");
+        // for (HashMap.Entry<String, NativeAudioAsset> entry : assetMap.entrySet()) {
+        //     NativeAudioAsset asset = entry.getValue();
+        //     boolean wasPlaying = asset.pause();
+        //     if (wasPlaying) {
+        //         resumeList.add(asset);
+        //     }
+        // }
     }
 
     @Override
     public void onResume(boolean multitasking) {
         super.onResume(multitasking);
-        Log.d(TAG, "[audio] onResume");
-        while (!resumeList.isEmpty()) {
-            NativeAudioAsset asset = resumeList.remove(0);
-            asset.resume();
-        }
+        Log.d(TAG, "[audio] onResume - doing nothing");
+        // while (!resumeList.isEmpty()) {
+        //     NativeAudioAsset asset = resumeList.remove(0);
+        //     asset.resume();
+        // }
     }
 }
