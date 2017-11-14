@@ -118,6 +118,26 @@ static const CGFloat FADE_DELAY = 0.08;
     }
 }
 
+- (void) pause
+{
+    NSLog(@"[audio] pausing");
+    for (int x = 0; x < [voices count]; x++) {
+        AVAudioPlayer * player = [voices objectAtIndex:x];
+        [player pause];
+    }
+}
+
+- (void) resume
+{
+    NSLog(@"[audio] resuming");
+    for (int x = 0; x < [voices count]; x++) {
+        AVAudioPlayer * player = [voices objectAtIndex:x];
+        if([player rate] == 0.0) { // if it's paused
+            [player play];
+        }
+    }
+}
+
 - (void) loop
 {
     [self stop];

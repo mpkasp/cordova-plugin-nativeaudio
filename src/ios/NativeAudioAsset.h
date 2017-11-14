@@ -25,6 +25,8 @@ typedef void (^CompleteCallback)(NSString*);
 - (void) playWithFade;
 - (void) stop;
 - (void) stopWithFade;
+- (void) pause;
+- (void) resume;
 - (void) loop;
 - (void) unload;
 - (void) setVolume:(NSNumber*) volume;
