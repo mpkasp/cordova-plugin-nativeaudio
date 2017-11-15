@@ -4,7 +4,7 @@
 //  NativeAudio
 //
 //  Created by Sidney Bofah on 2014-06-26.
-//
+//  Customized by Mike Kasparian 2017-11-13
 
 #import "NativeAudio.h"
 #import <AVFoundation/AVAudioSession.h>
@@ -345,12 +345,12 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
     NSString *callbackId = command.callbackId;
     NSArray* arguments = command.arguments;
     NSString *audioID = [arguments objectAtIndex:0];
+    NSLog(@"[resume]");
 
     [self.commandDelegate runInBackground:^{
         if (audioMapping) {
 
             NSObject* asset = audioMapping[audioID];
-
             if (asset != nil){
                 if ([asset isKindOfClass:[NativeAudioAsset class]]) {
                     NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
@@ -367,6 +367,26 @@ NSString* INFO_VOLUME_CHANGED = @"(NATIVE AUDIO) Volume changed.";
                     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
 
                 }
+            } else if ([audioMapping allKeys].count != 0) {
+                for(NSString* audioID in audioMapping) {
+                    NSObject* asset = audioMapping[audioID];
+                    if ([asset isKindOfClass:[NativeAudioAsset class]]) {
+                        NativeAudioAsset *_asset = (NativeAudioAsset*) asset;
+                        [_asset resume];
+
+                        NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_PLAYBACK_RESUME, audioID];
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
+
+                    } else if ( [asset isKindOfClass:[NSNumber class]] ) {
+                        NSNumber *_asset = (NSNumber*) asset;
+                        AudioServicesPlaySystemSound([_asset intValue]);
+
+                        NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", INFO_PLAYBACK_RESUME, audioID];
+                        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: RESULT] callbackId:callbackId];
+
+                    }
+                }
+
             } else {
 
                 NSString *RESULT = [NSString stringWithFormat:@"%@ (%@)", ERROR_REFERENCE_MISSING, audioID];

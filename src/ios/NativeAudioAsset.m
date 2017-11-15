@@ -4,7 +4,7 @@
 //  NativeAudioAsset
 //
 //  Created by Sidney Bofah on 2014-06-26.
-//
+//  Customized by Mike Kasparian 2017-11-13
 
 #import "NativeAudioAsset.h"
 
@@ -87,6 +87,7 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) stop
 {
+    NSLog(@"[audio] stopping");
     for (int x = 0; x < [voices count]; x++) {
         AVAudioPlayer * player = [voices objectAtIndex:x];
         [player stop];
@@ -122,6 +123,7 @@ static const CGFloat FADE_DELAY = 0.08;
 {
     NSLog(@"[audio] pausing");
     for (int x = 0; x < [voices count]; x++) {
+        NSLog(@"[audio] pausing %d", x);
         AVAudioPlayer * player = [voices objectAtIndex:x];
         [player pause];
     }
@@ -132,9 +134,7 @@ static const CGFloat FADE_DELAY = 0.08;
     NSLog(@"[audio] resuming");
     for (int x = 0; x < [voices count]; x++) {
         AVAudioPlayer * player = [voices objectAtIndex:x];
-        if([player rate] == 0.0) { // if it's paused
-            [player play];
-        }
+        [player play];
     }
 }
 
@@ -151,6 +151,7 @@ static const CGFloat FADE_DELAY = 0.08;
 
 - (void) unload 
 {
+    NSLog(@"[audio] unloading");
     [self stop];
     for (int x = 0; x < [voices count]; x++) {
         AVAudioPlayer * player = [voices objectAtIndex:x];

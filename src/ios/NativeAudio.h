@@ -4,7 +4,7 @@
 //  NativeAudio
 //
 //  Created by Sidney Bofah on 2014-06-26.
-//
+//  Customized by Mike Kasparian 2017-11-13
 
 #import <Foundation/Foundation.h>
 #import <Cordova/CDVPlugin.h>
@@ -26,6 +26,8 @@
 - (void) preloadComplex:(CDVInvokedUrlCommand *)command;
 - (void) play:(CDVInvokedUrlCommand *)command;
 - (void) stop:(CDVInvokedUrlCommand *)command;
+- (void) pause:(CDVInvokedUrlCommand *)command;
+- (void) resume:(CDVInvokedUrlCommand *)command;
 - (void) loop:(CDVInvokedUrlCommand *)command;
 - (void) unload:(CDVInvokedUrlCommand *)command;
 - (void) setVolumeForComplexAsset:(CDVInvokedUrlCommand *)command;

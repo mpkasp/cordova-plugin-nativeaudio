@@ -4,7 +4,7 @@
 //  NativeAudioAsset
 //
 //  Created by Sidney Bofah on 2014-06-26.
-//
+//  Customized by Mike Kasparian 2017-11-13
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVAudioPlayer.h>
